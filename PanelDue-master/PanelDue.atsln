@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Atmel Studio Solution File, Format Version 11.00
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{E66E83B9-2572-4076-B26E-6BE79FF3018A}") = "PanelDue", "PanelDue.cppproj", "{26D658E4-F528-46CB-95BE-04BCD132C099}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|ARM = Debug|ARM
+		Release-4.3|ARM = Release-4.3|ARM
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26D658E4-F528-46CB-95BE-04BCD132C099}.Debug|ARM.ActiveCfg = Debug|ARM
+		{26D658E4-F528-46CB-95BE-04BCD132C099}.Debug|ARM.Build.0 = Debug|ARM
+		{26D658E4-F528-46CB-95BE-04BCD132C099}.Release-4.3|ARM.ActiveCfg = Release-4.3|ARM
+		{26D658E4-F528-46CB-95BE-04BCD132C099}.Release-4.3|ARM.Build.0 = Release-4.3|ARM
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
