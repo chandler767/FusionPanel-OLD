@@ -71,14 +71,14 @@ static unsigned int newMessageSeq = 0;
 static int oldIntValue;
 static bool keyboardIsDisplayed = false;
 
-static OneBitPort BacklightPort(33);				// PB1 (aka port 33) controls the backlight on the prototype
-
 static bool restartNeeded = false;
 
 static int timesLeft[3];
 static String<50> timesLeftText;
 static String<maxUserCommandLength> userCommandBuffers[numUserCommandBuffers];
 static size_t currentUserCommandBuffer = 0, currentHistoryBuffer = 0;;
+
+static OneBitPort BacklightPort(33);		// PB1 (aka port 33) controls the backlight on the prototype
 
 struct FlashData
 {
@@ -121,7 +121,8 @@ enum class PrinterStatus
 	paused = 5,
 	busy = 6,
 	pausing = 7,
-	resuming = 8
+	resuming = 8,
+	flashing = 9
 };
 
 // Map of the above status codes to text. The space at the end improves the appearance.
@@ -130,12 +131,13 @@ const char *statusText[] =
 	"Connecting",
 	"Idle ",
 	"Printing ",
-	"Halted (needs reset)",
+	"Halted",
 	"Starting up ",
 	"Paused ",
 	"Busy ",
 	"Pausing ",
-	"Resuming "
+	"Resuming ",
+	"Firmware upload"
 };
 
 static PrinterStatus status = PrinterStatus::connecting;
@@ -161,6 +163,7 @@ enum ReceivedDataEvent
 	rcvGeometry,
 	rcvHeight,
 	rcvLayerHeight,
+	rcvMessage,
 	rcvMyName,
 	rcvProbe,
 	rcvResponse,
@@ -290,8 +293,7 @@ void ChangeTab(ButtonBase *newTab)
 	{
 		
 		
-		mgr.ClearPopup(false);
-		mgr.ClearPopup(false);				// in case there is more than one
+		mgr.ClearAllPopups();
 		switch(newTab->GetEvent())
 		{
 		case evTabControl:
@@ -344,7 +346,7 @@ void ChangeTab(ButtonBase *newTab)
 			mgr.SetRoot(messageRoot);
 			if (keyboardIsDisplayed)
 			{
-				mgr.SetPopup(keyboardPopup, 0, 0, false);
+				mgr.SetPopup(keyboardPopup, margin, (DisplayX - keyboardPopupWidth)/2, false);
 			}
 			break;
 		case evTabSetup:
@@ -366,13 +368,12 @@ void ChangeTab(ButtonBase *newTab)
 			mgr.SetRoot(commonRoot);
 			break;
 		}
-		mgr.ClearAll();
+		if (currentButton.GetButton() == newTab)
+		{
+			currentButton.Clear();			// to prevent it being released
+		}
+		mgr.Refresh(true);
 	}
-	if (currentButton.GetButton() == newTab)
-	{
-		currentButton.Clear();			// to prevent it being released
-	}
-	mgr.Refresh(true);
 	}
 }
 
@@ -894,7 +895,7 @@ void ProcessTouch(ButtonPress bp)
 			break;
 
 		case evInvertX:
-			nvData.lcdOrientation = static_cast<DisplayOrientation>(nvData.lcdOrientation ^ (ReverseX));
+			nvData.lcdOrientation = static_cast<DisplayOrientation>(nvData.lcdOrientation ^ (ReverseX | InvertBitmap));
 			lcd.InitLCD(nvData.lcdOrientation);        
 			CalibrateTouch();
 			CheckSettingsAreSaved();
@@ -1177,6 +1178,9 @@ void SetStatus(char c)
 	case 'D':
 		newStatus = PrinterStatus::pausing;
 		break;
+	case 'F':
+		newStatus = PrinterStatus::flashing;
+		break;
 	case 'I':
 		newStatus = PrinterStatus::idle;
 		break;
@@ -1321,6 +1325,7 @@ const ReceiveDataTableEntry nonArrayDataTable[] =
 	{ rcvGeometry,		"geometry" },
 	{ rcvHeight,		"height" },
 	{ rcvLayerHeight,	"layerHeight" },
+	{ rcvMessage,		"message" },
 	{ rcvMyName,		"myName" },
 	{ rcvProbe,			"probe" },
 	{ rcvResponse,		"resp" },
@@ -1649,7 +1654,19 @@ void ProcessReceivedValue(const char id[], const char data[], int index)
 		case rcvDir:
 			FileManager::ReceiveDirectoryName(data);
 			break;
-
+			
+		case rcvMessage:
+			if (data[0] == 0)
+			{
+				mgr.ClearPopup(true, alertPopup);
+			}
+			else
+			{
+				alertText.copyFrom(data);
+				mgr.SetPopup(alertPopup, (DisplayX - alertPopupWidth)/2, (DisplayY - alertPopupHeight)/2);
+			}
+			break;
+			
 		default:
 			break;
 		}

@@ -134,14 +134,16 @@ public:
 	ButtonPress FindEvent(PixelNumber x, PixelNumber y);
 	ButtonPress FindEventOutsidePopup(PixelNumber x, PixelNumber y);
 	DisplayField * null GetRoot() const { return root; }
+	virtual void Refresh(bool full) = 0;
 	void Redraw(DisplayField *f);
 	void Show(DisplayField *f, bool v);
 	void Press(ButtonPress bp, bool v);
 	void SetPopup(PopupWindow * p, PixelNumber px = 0, PixelNumber py = 0, bool redraw = true);
 	PopupWindow * null GetPopup() const { return next; }
-	void ClearPopup(bool redraw = true);
+	void ClearPopup(bool redraw = true, PopupWindow *whichOne = nullptr);
 	bool ObscuredByPopup(const DisplayField *p) const;
 	bool Visible(const DisplayField *p) const;
+	virtual bool Contains(PixelNumber xmin, PixelNumber ymin, PixelNumber xmax, PixelNumber ymax) const = 0;
 };
 
 class MainWindow : public Window
@@ -150,8 +152,10 @@ public:
 	MainWindow();
 	void Init(Colour pb);
 	void ClearAll();
-	void Refresh(bool full = 0);
+	void Refresh(bool full) override;
 	void SetRoot(DisplayField * null r) { root = r; }
+	bool Contains(PixelNumber xmin, PixelNumber ymin, PixelNumber xmax, PixelNumber ymax) const override;
+	void ClearAllPopups();
 };
 
 class PopupWindow : public Window
@@ -161,12 +165,14 @@ private:
 	
 public:
 	PopupWindow(PixelNumber ph, PixelNumber pw, Colour pb);
+	
 	PixelNumber GetHeight() const { return height; }
 	PixelNumber GetWidth() const { return width; }
 	PixelNumber Xpos() const override { return xPos; }
 	PixelNumber Ypos() const override { return yPos; }
-	void Refresh(bool full);
+	void Refresh(bool full) override;
 	void SetPos(PixelNumber px, PixelNumber py) { xPos = px; yPos = py; }
+	bool Contains(PixelNumber xmin, PixelNumber ymin, PixelNumber xmax, PixelNumber ymax) const override;
 };
 
 // Base class for fields displaying text
@@ -366,12 +372,13 @@ protected:
 public:
 	CharButton(PixelNumber py, PixelNumber px, PixelNumber pw, char pc, event_t e);
 };
-
+#if 0	// not used yet
 class ButtonRow : public ButtonBase
 {
-	unsigned int numButtons;
-	int whichPressed;
-	PixelNumber step;
+	protected:
+		unsigned int numButtons;
+		int whichPressed;
+		PixelNumber step;
 	
 public:
 	ButtonRow(PixelNumber py, PixelNumber px, PixelNumber pw, PixelNumber ps, unsigned int nb, event_t e);
@@ -400,6 +407,7 @@ protected:
 public:
 	CharButtonRow(PixelNumber py, PixelNumber px, PixelNumber pw, PixelNumber ps, const char * array s, event_t e);
 };
+#endif
 
 class TextButton : public ButtonWithText
 {
