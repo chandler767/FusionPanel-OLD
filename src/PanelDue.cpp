@@ -943,7 +943,11 @@ void ProcessTouch(ButtonPress bp)
 		case evAdjustLanguage:
 			nvData.language = bp.GetIParam();
 			languageButton->SetText(longLanguageNames[nvData.language]);
-			CheckSettingsAreSaved();						// not sure we need this because we are going to reset anyway
+			CheckSettingsAreSaved(); // not sure we need this because we are going to reset anyway
+			if (nvData.language != savedNvData.language) 
+			{
+				restartNeeded = true;
+			}				
 			break;
 
 		case evYes:
