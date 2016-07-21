@@ -69,6 +69,7 @@ namespace Fields
 		{
 			window->AddField(new StaticTextField(popupTopMargin + labelRowAdjust, popupSideMargin + closeButtonWidth + popupFieldSpacing, pw - 2 * (popupSideMargin + closeButtonWidth + popupFieldSpacing), TextAlignment::Centre, title));
 		}
+		DisplayField::SetDefaultColours(buttonTextColour, buttonBackColour);
 		window->AddField(new IconButton(popupTopMargin, pw - (closeButtonWidth +
 		popupSideMargin), closeButtonWidth, IconCancel, evCancel));
 		return window;
@@ -371,7 +372,7 @@ namespace Fields
 		static const char * array extrudeSpeedValues[] = { "50", "40", "20", "10", "5" };
 		static const char * array extrudeSpeedParams[] = { "3000", "2400", "1200", "600", "300" };
 
-		extrudePopup = CreatePopupWindow(extrudePopupHeight, extrudePopupWidth, popupBackColour, popupButtonTextColour, "Extrusion amount (mm)");
+		extrudePopup = CreatePopupWindow(extrudePopupHeight, extrudePopupWidth, popupBackColour, popupTextColour, "Extrusion amount (mm)");
 		PixelNumber ypos = popupTopMargin + buttonHeight + extrudeButtonRowSpacing;
 		DisplayField::SetDefaultColours(popupButtonTextColour, popupButtonBackColour);
 		currentExtrudeAmountPress = CreateStringButtonRow(extrudePopup, ypos, popupSideMargin, extrudePopupWidth - 2 * popupSideMargin, fieldSpacing, 6, extrudeAmountValues, extrudeAmountValues, evExtrudeAmount, 3);
