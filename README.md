@@ -2,7 +2,7 @@
 This is a modified version of the [PanelDue Firmware](https://github.com/dc42/PanelDue) for the PanelDue 3D printer user interface board and has been modified for use only with the [F400 3D Printer](http://fusion3design.com).
 
 # Changes
-This firmware is based off of version 1.13 of the PanelDue Firmware. Most of the changes are in the UI and feature addition/removal for the needs of the F400.
+This firmware is based off of version 1.13 of the PanelDue Firmware and has been updated to include features in PanelDue Firmware version 1.14. Most of the changes are in the UI and feature addition/removal for the needs of the F400.
 
 # Instructions
 * Build instructions: Load the file FusionPanel.cppproj into Atmel Studio 7.0. Build for the 4.3 inch display. 
